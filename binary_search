@@ -1,1 +1,84 @@
+1月5日星期四
+2023年1月5日
+17:15
+二分法仍然没有彻底弄懂，困难在于区间选择 - 指针初始位置 - while条件 - 指针的更新 - 返回值之间和本身的逻辑。
+以双闭区间为例：
+当规定target在[left, right]中时，由于可以取到left和right，所以指针的初始位置就是index的第一个和最后一个位置。
+Left = 0
+Right = len(nums)-1
+由于双闭区间的规定，left=right的情况是有意义的，所以while条件中可带等于号
+While(left<=right)
+mid的计算没什么难点，但要放在while里更新
+Mid = left + (right - left)//2
+当nums[mid] > target时，由于原始nums是递增的，说明target不在[mid, right]里面，从而把right更新到mid - 1(mid-1是不在条件判断中的)
+当nums[mid] < target时，由于原始nums是递增的，说明target不在[left, mid]里面，从而把left更新到mid + 1(mid+1也是不在条件判断中的)
+如果nums[mid]==target，直接返回mid
+否则返回-1
+上述代码已验证可行，源码：
 
+class Solution:
+    def search(self, nums: List[int], target: int) -> int:
+        left, right = 0, len(nums)-1
+        while(left<=right):
+            mid = left + (right - left)//2
+            if nums[mid] == target:
+                return mid
+            elif nums[mid] < target:
+                left = mid + 1
+            elif nums[mid] > target:
+                right = mid - 1
+        return -1
+
+双开区间情况
+当规定target在(left, right)中时，由于不能取到left和right，所以指针的初始位置就是index的第一个左边和最后一个右边的位置。
+Left = -1
+Right = len(nums)
+由于双开区间的规定，left=right的情况是没有意义的，所以while条件中中小于号，再者，为保证循环的次数为len(nums)-1次，判断中使用left +1（也可以用right -1）
+While(left+1 < right)
+mid的计算没什么难点，但要放在while里更新
+Mid = left + (right - left)//2
+当nums[mid] > target时，由于原始nums是递增的，说明target不在(mid, right)里面，从而把right更新到mid，新区间变成(left, mid)
+当nums[mid] < target时，由于原始nums是递增的，说明target不在(left, mid)里面，从而把left更新到mid，新区间变成(mid, right)
+如果nums[mid]==target，直接返回mid
+否则返回-1
+
+代码：
+
+class Solution:
+    def search(self, nums: List[int], target: int) -> int:
+        left, right = -1, len(nums)
+        while(left<right-1):
+            mid = left + (right - left)//2
+            if nums[mid] == target:
+                return mid
+            elif nums[mid] < target:
+                left = mid 
+            elif nums[mid] > target:
+                right = mid
+        return -1
+
+最后一种情况，左闭右开
+假设target在[left,right)中，由于left=right时无意义，所以指针的初始位置是index的第一个以及最后一个的右边位置
+初始化left = 0
+Right = len(nums)
+While(left < right)
+Mid = left + (right - left)//2
+当nums[mid] < target时，由于原始nums是递增的，说明target不在[left, mid)里面，从而把left更新到mid+1，新区间变成[mid+1, right) 
+当nums[mid] > target时，由于原始nums是递增的，说明target不在[mid, right)里面，从而把right更新到mid，新区间变成[left, mid)
+如果nums[mid]==target，直接返回mid
+否则返回-1
+
+代码：
+
+class Solution:
+    def search(self, nums: List[int], target: int) -> int:
+        left, right = 0, len(nums)
+        while(left<right):
+            mid = left + (right - left)//2
+            if nums[mid] == target:
+                return mid
+            elif nums[mid] < target:
+                left = mid + 1 
+            elif nums[mid] > target:
+                right = mid
+        return -1
